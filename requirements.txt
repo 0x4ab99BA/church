@@ -1,3 +1,6 @@
-flask
+flask~=2.3.3
 Flask-SQLAlchemy
 flask-login
+werkzeug~=2.3.7
+SQLAlchemy~=2.0.20
+WTForms~=3.0.1
