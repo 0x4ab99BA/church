@@ -7,6 +7,7 @@ from flask_wtf import FlaskForm, RecaptchaField
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired
 from flask_wtf.recaptcha import validators
+import re
 
 auth = Blueprint('auth', __name__)
 
@@ -47,19 +48,32 @@ def logout():
     return redirect(url_for('auth.login'))
 
 
+class SignUpForm(FlaskForm):
+    email = StringField('email', validators=[DataRequired()])
+    first_name = StringField('firstName', validators=[DataRequired()])
+    password1 = PasswordField('password1', validators=[DataRequired()])
+    password2 = PasswordField('password2', validators=[DataRequired()])
+    recaptcha = RecaptchaField(validators=[validators.Recaptcha()])
+    submit = SubmitField('signUp')
+
+
 @auth.route('/sign-up', methods=['GET', 'POST'])
 def sign_up():
-    if request.method == 'POST':
-        email = request.form.get('email')
-        first_name = request.form.get('firstName')
-        password1 = request.form.get('password1')
-        password2 = request.form.get('password2')
+    form = SignUpForm()
+    if form.validate_on_submit():
+
+        email = form.email.data
+        first_name = form.first_name.data
+        password1 = form.password1.data
+        password2 = form.password2.data
 
         user = User.query.filter_by(email=email).first()
+
+        pattern = r'^[\w\.-]+@[\w\.-]+\.\w+$'
         if user:
             flash('Email already exists.', category='error')
-        elif len(email) < 4:
-            flash('Email must be greater than 3 characters.', category='error')
+        elif not re.match(pattern, email):
+            flash('Please input a valid email address.', category='error')
         elif len(first_name) < 2:
             flash('First name must be greater than 1 character.', category='error')
         elif password1 != password2:
@@ -68,11 +82,11 @@ def sign_up():
             flash('Password must be at least 7 characters.', category='error')
         else:
             new_user = User(email=email, first_name=first_name, password=generate_password_hash(
-                password1, method='scrypt'))
+                password1, method='pbkdf2:sha256'))
             db.session.add(new_user)
             db.session.commit()
             login_user(new_user, remember=True)
             flash('Account created!', category='success')
             return redirect(url_for('views.home'))
 
-    return render_template("sign_up.html", user=current_user)
+    return render_template("sign_up.html", form=form, user=current_user)
