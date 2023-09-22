@@ -5,7 +5,7 @@ from . import db
 from flask_login import login_user, login_required, logout_user, current_user
 from flask_wtf import FlaskForm, RecaptchaField
 from wtforms import StringField, PasswordField, SubmitField
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, Email, InputRequired
 from flask_wtf.recaptcha import validators
 import re
 
@@ -13,7 +13,7 @@ auth = Blueprint('auth', __name__)
 
 
 class LoginForm(FlaskForm):
-    email = StringField('email', validators=[DataRequired()])
+    email = StringField('email', validators=[InputRequired(), Email()])
     password = PasswordField('password', validators=[DataRequired()])
     recaptcha = RecaptchaField(validators=[validators.Recaptcha()])
     submit = SubmitField('login')
@@ -49,7 +49,7 @@ def logout():
 
 
 class SignUpForm(FlaskForm):
-    email = StringField('email', validators=[DataRequired()])
+    email = StringField('email', validators=[InputRequired(), Email()])
     first_name = StringField('firstName', validators=[DataRequired()])
     password1 = PasswordField('password1', validators=[DataRequired()])
     password2 = PasswordField('password2', validators=[DataRequired()])
@@ -82,7 +82,7 @@ def sign_up():
             flash('Password must be at least 7 characters.', category='error')
         else:
             new_user = User(email=email, first_name=first_name, password=generate_password_hash(
-                password1, method='pbkdf2:sha256'))
+                password1))
             db.session.add(new_user)
             db.session.commit()
             login_user(new_user, remember=True)

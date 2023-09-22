@@ -1,6 +1,7 @@
 from . import db
 from flask_login import UserMixin
 from sqlalchemy.sql import func
+from datetime import datetime
 
 
 class Note(db.Model):
@@ -16,3 +17,11 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(150))
     first_name = db.Column(db.String(150))
     notes = db.relationship('Note')
+
+
+class Group(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(150), unique=True)
+    description = db.Column(db.String(255))
+    creator = db.Column(db.String(150))
+    time = db.Column(db.DateTime, default=datetime.utcnow)

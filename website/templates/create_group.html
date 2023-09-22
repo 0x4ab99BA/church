@@ -1,0 +1,19 @@
+{% extends "base.html" %} {% block title %}Sign Up{% endblock %}
+{% block content %}
+    <form method="POST">
+        <h3 align="center">Create group</h3>
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            <label for="name">Name</label>
+            {{ form.name(class="form-control") }}
+        </div>
+
+        <div class="form-group">
+            <label for="description">Descript your group</label>e
+            {{ form.description(class="form-control") }}
+
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary">sumit</button>
+        </div>
+    </form>
+{% endblock %}
