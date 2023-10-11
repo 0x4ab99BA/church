@@ -1,17 +1,37 @@
 {% extends "base.html" %} {% block title %}Home{% endblock %} {% block content
 %}
-    <h1 align="center">Notes</h1>
-    <a href="{{ url_for('views.create_group') }}" class="btn btn-primary">+</a>
+    <h1 align="center">Groups</h1>
+    <div class="group-list">
+        {% for group in groups %}
+            <div class="group">
+                <h3>{{ group.name }}</h3>
+                <p><strong>Description:</strong> {{ group.description }}</p>
+                <p><strong>Creator:</strong> {{ group.creator }}</p>
+                <p><strong>Date:</strong> {{ group.time }}</p>
+            </div>
+        {% endfor %}
+    </div>
 
-    <ul class="list-group list-group-flush" id="notes">
-      {% for note in user.notes %}
-      <li class="list-group-item">
-        {{ note.data }}
-        <button type="button" class="close" onClick="deleteNote({{ note.id }})">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </li>
-      {% endfor %}
-    </ul>
+     <div class="pagination">
+        <ul class="pagination">
+            {% if groups.has_prev %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('views.groups', page=groups.prev_num) }}">Previous</a>
+                </li>
+            {% endif %}
+            {% for page_num in groups.iter_pages() %}
+                <li class="page-item{% if groups.page == page_num %} active{% endif %}">
+                    <a class="page-link" href="{{ url_for('views.groups', page=page_num) }}">{{ page_num }}</a>
+                </li>
+            {% endfor %}
+            {% if groups.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('views.groups', page=groups.next_num) }}">Next</a>
+                </li>
+            {% endif %}
+        </ul>
+     </div>
+
+    <a href="{{ url_for('views.create_group') }}" class="btn btn-primary">+</a>
 
 {% endblock %}

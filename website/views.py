@@ -1,12 +1,14 @@
+import json
+
 from flask import Blueprint, render_template, request, flash, jsonify, redirect, url_for
 from flask_login import login_required, current_user
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired, Optional
-from .models import Note
-from .models import Group
+
 from . import db
-import json
+from .models import Group
+from .models import Note
 
 views = Blueprint('views', __name__)
 
@@ -44,7 +46,11 @@ def delete_note():
 @views.route('/groups', methods=['GET', 'POST'])
 @login_required
 def groups():
-    return render_template("groups.html", user=current_user)
+    page = request.args.get('page', 1, type=int)
+    per_page = 4  # Number of items per page
+
+    groups = Group.query.paginate(page=page, per_page=per_page)
+    return render_template("groups.html", user=current_user, groups=groups)
 
 
 class GroupForm(FlaskForm):

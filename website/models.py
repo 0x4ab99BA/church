@@ -22,6 +22,6 @@ class User(db.Model, UserMixin):
 class Group(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(150), unique=True)
-    description = db.Column(db.String(255))
+    description = db.Column(db.Text(500))
     creator = db.Column(db.String(150))
-    time = db.Column(db.DateTime, default=datetime.utcnow)
+    time = db.Column(db.DateTime, default=datetime.now)
