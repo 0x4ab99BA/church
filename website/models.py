@@ -4,6 +4,13 @@ from sqlalchemy.sql import func
 from datetime import datetime
 
 
+user_group = db.Table(
+    'user_group',
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
+    db.Column('group_id', db.Integer, db.ForeignKey('group.id'))
+)
+
+
 class Note(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     data = db.Column(db.String(10000))
@@ -17,6 +24,7 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(150))
     first_name = db.Column(db.String(150))
     notes = db.relationship('Note')
+    subscriptions = db.relationship('Group', secondary=user_group, back_populates='subscribers')
 
 
 class Group(db.Model):
@@ -25,3 +33,9 @@ class Group(db.Model):
     description = db.Column(db.Text(500))
     creator = db.Column(db.String(150))
     time = db.Column(db.DateTime, default=datetime.now)
+    subscribers = db.relationship('User', secondary=user_group, back_populates='subscriptions')
+
+
+
+
+

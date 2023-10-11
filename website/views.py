@@ -16,6 +16,8 @@ views = Blueprint('views', __name__)
 @views.route('/', methods=['GET', 'POST'])
 @login_required
 def home():
+    subscribed_groups = current_user.subscriptions
+
     if request.method == 'POST':
         note = request.form.get('note')  # Gets the note from the HTML
 
@@ -27,7 +29,7 @@ def home():
             db.session.commit()
             flash('Note added!', category='success')
 
-    return render_template("home.html", user=current_user)
+    return render_template("home.html", user=current_user, subscribed_groups=subscribed_groups)
 
 
 @views.route('/delete-note', methods=['POST'])
@@ -83,3 +85,23 @@ def create_group():
             return redirect(url_for('views.groups'))
 
     return render_template("create_group.html", form=form, user=current_user)
+
+
+@views.route('/subscribe/<int:group_id>', methods=['POST'])
+@login_required
+def subscribe(group_id):
+    group = Group.query.get(group_id)
+    user = current_user
+    user.subscriptions.append(group)
+    db.session.commit()
+    return redirect(url_for('views.groups'))
+
+
+@views.route('/unsubscribe/<int:group_id>', methods=['POST'])
+@login_required
+def unsubscribe(group_id):
+    group = Group.query.get(group_id)
+    user = current_user
+    user.subscriptions.remove(group)
+    db.session.commit()
+    return redirect(url_for('views.groups'))

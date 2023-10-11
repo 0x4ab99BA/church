@@ -1,21 +1,32 @@
-{% extends "base.html" %} {% block title %}Home{% endblock %} {% block content
-%}
-<h1 align="center">Notes</h1>
-<ul class="list-group list-group-flush" id="notes">
-  {% for note in user.notes %}
-  <li class="list-group-item">
-    {{ note.data }}
-    <button type="button" class="close" onClick="deleteNote({{ note.id }})">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </li>
-  {% endfor %}
-</ul>
-<form method="POST">
-  <textarea name="note" id="note" class="form-control"></textarea>
-  <br />
-  <div align="center">
-    <button type="submit" class="btn btn-primary">Add Note</button>
-  </div>
-</form>
+{% extends "base.html" %} {% block title %}Home{% endblock %}
+{% block content %}
+    <h1 align="center">Your Subscribed Groups</h1>
+    <div class="group-list">
+        {% for group in subscribed_groups %}
+            <div class="group">
+                <h3>{{ group.name }}</h3>
+                <p><strong>Description:</strong> {{ group.description }}</p>
+                <p><strong>Creator:</strong> {{ group.creator }}</p>
+                <p><strong>Date:</strong> {{ group.time }}</p>
+            </div>
+        {% endfor %}
+    </div>
+{#<h1 align="center">Notes</h1>#}
+{#<ul class="list-group list-group-flush" id="notes">#}
+{#  {% for note in user.notes %}#}
+{#  <li class="list-group-item">#}
+{#    {{ note.data }}#}
+{#    <button type="button" class="close" onClick="deleteNote({{ note.id }})">#}
+{#      <span aria-hidden="true">&times;</span>#}
+{#    </button>#}
+{#  </li>#}
+{#  {% endfor %}#}
+{#</ul>#}
+{#<form method="POST">#}
+{#  <textarea name="note" id="note" class="form-control"></textarea>#}
+{#  <br />#}
+{#  <div align="center">#}
+{#    <button type="submit" class="btn btn-primary">Add Note</button>#}
+{#  </div>#}
+{#</form>#}
 {% endblock %}
