@@ -2,7 +2,7 @@ import json
 from flask import Blueprint, render_template, request, flash, jsonify, redirect, url_for
 from flask_login import login_required, current_user
 from . import db
-from .models import Group, Note, GroupForm, PostForm, Post
+from .models import Group, Note, GroupForm, PostForm, Post, User
 
 views = Blueprint('views', __name__)
 
@@ -12,18 +12,24 @@ views = Blueprint('views', __name__)
 def home():
     subscribed_groups = current_user.subscriptions
 
-    if request.method == 'POST':
-        note = request.form.get('note')  # Gets the note from the HTML
+    if current_user.is_authenticated:
+        # 查询当前用户订阅的群组
+        user = User.query.get(current_user.id)
+        subscribed_groups = user.subscriptions
 
-        if len(note) < 1:
-            flash('Note is too short!', category='error')
-        else:
-            new_note = Note(data=note, user_id=current_user.id)  # providing the schema for the note
-            db.session.add(new_note)  # adding the note to the database
-            db.session.commit()
-            flash('Note added!', category='success')
+        # 查询每个群组的最新帖子
+        latest_posts = []
+        for group in subscribed_groups:
+            latest_post = Post.query.filter_by(group_id=group.id).order_by(Post.created_at.desc()).first()
+            if latest_post:
+                latest_posts.append(latest_post)
 
-    return render_template("home.html", user=current_user, subscribed_groups=subscribed_groups)
+        return render_template('home.html',
+                               latest_posts=latest_posts,
+                               user=current_user,
+                               subscribed_groups=subscribed_groups)
+
+    return redirect(url_for('auth.login'))
 
 
 @views.route('/delete-note', methods=['POST'])

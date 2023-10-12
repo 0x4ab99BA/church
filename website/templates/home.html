@@ -1,6 +1,20 @@
 {% extends "base.html" %} {% block title %}Home{% endblock %}
 {% block content %}
-    <h1 align="center">Your Subscribed Groups</h1>
+
+    <h2 align="center">Latest Posts from Subscribed Groups</h2>
+
+    <ul>
+        {% for post in latest_posts %}
+            <li>
+                <h3>{{ post.title }}</h3>
+                <p>{{ post.content }}</p>
+                <!-- Add image display code-->
+            </li>
+        {% endfor %}
+    </ul>
+
+
+    <h2 align="center">Your Subscribed Groups</h2>
     <div class="group-list">
         {% for group in subscribed_groups %}
             <div class="group">
@@ -11,22 +25,4 @@
             </div>
         {% endfor %}
     </div>
-{#<h1 align="center">Notes</h1>#}
-{#<ul class="list-group list-group-flush" id="notes">#}
-{#  {% for note in user.notes %}#}
-{#  <li class="list-group-item">#}
-{#    {{ note.data }}#}
-{#    <button type="button" class="close" onClick="deleteNote({{ note.id }})">#}
-{#      <span aria-hidden="true">&times;</span>#}
-{#    </button>#}
-{#  </li>#}
-{#  {% endfor %}#}
-{#</ul>#}
-{#<form method="POST">#}
-{#  <textarea name="note" id="note" class="form-control"></textarea>#}
-{#  <br />#}
-{#  <div align="center">#}
-{#    <button type="submit" class="btn btn-primary">Add Note</button>#}
-{#  </div>#}
-{#</form>#}
 {% endblock %}
