@@ -2,7 +2,10 @@ from . import db
 from flask_login import UserMixin
 from sqlalchemy.sql import func
 from datetime import datetime
-
+from flask_wtf import FlaskForm
+from wtforms import StringField, SubmitField
+from wtforms.validators import DataRequired, Optional
+from flask_wtf.file import FileField, FileAllowed
 
 user_group = db.Table(
     'user_group',
@@ -36,6 +39,13 @@ class Group(db.Model):
     subscribers = db.relationship('User', secondary=user_group, back_populates='subscriptions')
 
 
+class BannerUploadForm(FlaskForm):
+    banner = FileField('Upload Banner Image', validators=[FileAllowed(['jpg', 'png', 'jpeg'], 'Images only!')])
+    submit = SubmitField('Upload')
 
 
-
+class GroupForm(FlaskForm):
+    name = StringField('name', validators=[DataRequired()])
+    description = StringField('description', validators=[DataRequired()])
+    creator = StringField('creator', validators=[Optional()])
+    submit = SubmitField('submit')

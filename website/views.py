@@ -1,14 +1,8 @@
 import json
-
 from flask import Blueprint, render_template, request, flash, jsonify, redirect, url_for
 from flask_login import login_required, current_user
-from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField
-from wtforms.validators import DataRequired, Optional
-
 from . import db
-from .models import Group
-from .models import Note
+from .models import Group, Note, GroupForm, BannerUploadForm
 
 views = Blueprint('views', __name__)
 
@@ -55,13 +49,6 @@ def groups():
     return render_template("groups.html", user=current_user, groups=groups)
 
 
-class GroupForm(FlaskForm):
-    name = StringField('name', validators=[DataRequired()])
-    description = StringField('description', validators=[DataRequired()])
-    creator = StringField('creator', validators=[Optional()])
-    submit = SubmitField('submit')
-
-
 @views.route('/create_group', methods=['GET', 'POST'])
 @login_required
 def create_group():
@@ -105,3 +92,14 @@ def unsubscribe(group_id):
     user.subscriptions.remove(group)
     db.session.commit()
     return redirect(url_for('views.groups'))
+
+
+@views.route('/group/<string:group_name>')
+@login_required
+def group_content(group_name):
+    return render_template('group_content.html', group_name=group_name, user=current_user)
+
+
+
+
+
