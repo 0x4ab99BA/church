@@ -5,7 +5,7 @@
         {% for group in groups %}
             <div class="group">
 {#                <h3>{{ group.name }}</h3>#}
-                <h3><a href="{{ url_for('views.group_content', group_name=group.name) }}">{{ group.name }}</a></h3>
+                <h3><a href="{{ url_for('views.group_content', group_id=group.id) }}">{{ group.name }}</a></h3>
                 <p><strong>Description:</strong> {{ group.description }}</p>
                 <p><strong>Creator:</strong> {{ group.creator }}</p>
                 <p><strong>Date:</strong> {{ group.time }}</p>

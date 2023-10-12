@@ -2,7 +2,7 @@ import json
 from flask import Blueprint, render_template, request, flash, jsonify, redirect, url_for
 from flask_login import login_required, current_user
 from . import db
-from .models import Group, Note, GroupForm, BannerUploadForm
+from .models import Group, Note, GroupForm, PostForm, Post
 
 views = Blueprint('views', __name__)
 
@@ -94,12 +94,21 @@ def unsubscribe(group_id):
     return redirect(url_for('views.groups'))
 
 
-@views.route('/group/<string:group_name>')
+@views.route('/group/<int:group_id>/content', methods=['GET', 'POST'])
 @login_required
-def group_content(group_name):
-    return render_template('group_content.html', group_name=group_name, user=current_user)
+def group_content(group_id):
+    group = Group.query.get(group_id)
+    form = PostForm()
+    posts = Post.query.filter_by(group_id=group_id).all()
 
+    if form.validate_on_submit():
+        title = form.title.data
+        content = form.content.data
+        image = form.image.data
+        post = Post(title=title, content=content, image=image, user_id=current_user.id, group_id=group_id)
+        db.session.add(post)
+        db.session.commit()
+        flash('Post created successfully', 'success')
+        return redirect(url_for('views.group_content', group_id=group_id))
 
-
-
-
+    return render_template('group_content.html', form=form, group=group, user=current_user, posts=posts)
