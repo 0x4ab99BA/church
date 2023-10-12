@@ -1,4 +1,4 @@
-# CCCC website
+# canberra chinese christian church (CCCC) information management system
 
 ## Setup & Installation
 
