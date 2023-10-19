@@ -6,6 +6,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, TextAreaField, FileField
 from wtforms.validators import DataRequired, Optional
 from flask_wtf.file import FileField, FileAllowed
+from flask_ckeditor import CKEditorField
 
 user_group = db.Table(
     'user_group',
@@ -68,6 +69,5 @@ class GroupForm(FlaskForm):
 
 class PostForm(FlaskForm):
     title = StringField('Title', validators=[DataRequired()])
-    content = TextAreaField('Content', validators=[DataRequired()])
-    image = FileField('Image')
+    content = CKEditorField('Content', validators=[DataRequired()])
     submit = SubmitField('Submit')

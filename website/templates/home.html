@@ -6,8 +6,13 @@
     <ul>
         {% for post in latest_posts %}
             <li>
-                <h3>{{ post.title }}</h3>
-                <p>{{ post.content }}</p>
+{#                <h3>{{ post.title }}</h3>&nbsp;&nbsp;&nbsp;#}
+                <p> <span class="font-weight-bold"> {{ post.title }} </span>
+                        Posted by <span class="font-weight-bold">{{ post.user.first_name }} </span>
+                        on {{ post.created_at.strftime('%Y-%m-%d %H:%M:%S') }}
+                </p>
+{#                <p>Posted by {{ post.user.first_name }} on {{ post.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>#}
+{#                <p>{{ post.content|safe }}</p>#}
                 <!-- Add image display code-->
             </li>
         {% endfor %}

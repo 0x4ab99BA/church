@@ -4,6 +4,7 @@ from flask_login import login_required, current_user
 from . import db
 from .models import Group, Note, GroupForm, PostForm, Post, User
 
+
 views = Blueprint('views', __name__)
 
 
@@ -110,8 +111,7 @@ def group_content(group_id):
     if form.validate_on_submit():
         title = form.title.data
         content = form.content.data
-        image = form.image.data
-        post = Post(title=title, content=content, image=image, user_id=current_user.id, group_id=group_id)
+        post = Post(title=title, content=content, user_id=current_user.id, group_id=group_id)
         db.session.add(post)
         db.session.commit()
         flash('Post created successfully', 'success')

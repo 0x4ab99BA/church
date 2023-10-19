@@ -2,9 +2,11 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from os import path
 from flask_login import LoginManager
+from flask_ckeditor import CKEditor
 
 db = SQLAlchemy()
 DB_NAME = "database.db"
+ckeditor = CKEditor()
 
 
 def create_app():
@@ -15,9 +17,10 @@ def create_app():
     app.config['RECAPTCHA_PUBLIC_KEY'] = '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'
     app.config['RECAPTCHA_PRIVATE_KEY'] = '6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe'
     app.config['RECAPTCHA_OPTIONS'] = {'theme': 'white'}
-
+    app.config["UPLOADED_PHOTOS_DEST"] = "uploads/pictures"
 
     db.init_app(app)
+    ckeditor.init_app(app)
 
     from .views import views
     from .auth import auth
@@ -26,7 +29,7 @@ def create_app():
     app.register_blueprint(auth, url_prefix='/')
 
     from .models import User, Note
-    
+
     with app.app_context():
         db.create_all()
 

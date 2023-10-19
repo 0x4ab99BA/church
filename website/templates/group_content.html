@@ -1,6 +1,8 @@
 {% extends "base.html" %} {% block title %}Home{% endblock %}
 
 {% block content %}
+
+    {{ ckeditor.load() }}
     <h1 align="center">{{ group.name }} </h1>
 
     <h2>Posts</h2>
@@ -8,7 +10,7 @@
         {% for post in posts %}
             <li>
                 <h3>{{ post.title }}</h3>
-                <p>{{ post.content }}</p>
+                <p>{{ post.content|safe }}</p>
                 <!-- Add image display code  -->
             </li>
         {% endfor %}
@@ -26,12 +28,11 @@
             {{ form.content(class="form-control") }}
         </div>
         <div class="form-group">
-            {{ form.image.label(class="form-control-label") }}
-            {{ form.image(class="form-control-file") }}
-        </div>
-        <div class="form-group">
             {{ form.submit(class="btn btn-primary") }}
         </div>
     </form>
+
+    {{ ckeditor.load() }}
+    {{ ckeditor.config(name='body') }}
 
 {% endblock %}
