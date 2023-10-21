@@ -1,12 +1,13 @@
-from flask import Flask
+from flask import Flask, request, url_for, send_from_directory, render_template
 from flask_sqlalchemy import SQLAlchemy
 from os import path
 from flask_login import LoginManager
-from flask_ckeditor import CKEditor
+from flask_ckeditor import CKEditor, upload_fail, upload_success, CKEditorField
+import os
 
 db = SQLAlchemy()
 DB_NAME = "database.db"
-ckeditor = CKEditor()
+basedir = os.path.abspath(os.path.dirname(__file__))
 
 
 def create_app():
@@ -17,10 +18,17 @@ def create_app():
     app.config['RECAPTCHA_PUBLIC_KEY'] = '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'
     app.config['RECAPTCHA_PRIVATE_KEY'] = '6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe'
     app.config['RECAPTCHA_OPTIONS'] = {'theme': 'white'}
-    app.config["UPLOADED_PHOTOS_DEST"] = "uploads/pictures"
+    app.config['CKEDITOR_PKG_TYPE'] = 'full'
+    app.config['CKEDITOR_SERVE_LOCAL'] = True
+    app.config['CKEDITOR_HEIGHT'] = 400
+    app.config['CKEDITOR_FILE_UPLOADER'] = 'views.upload'
+    app.config['UPLOADED_PATH'] = os.path.join(basedir, 'uploads')
 
     db.init_app(app)
-    ckeditor.init_app(app)
+    ckeditor = CKEditor(app)
+    # csrf = CSRFProtect(app)
+    # ckeditor.init_app(app)
+    # ckeditor = CKEditor(app)
 
     from .views import views
     from .auth import auth

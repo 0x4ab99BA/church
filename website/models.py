@@ -67,7 +67,15 @@ class GroupForm(FlaskForm):
     submit = SubmitField('submit')
 
 
+# class PostForm(FlaskForm):
+#     title = StringField('Title', validators=[DataRequired()])
+#     content = CKEditorField('Body', validators=[DataRequired()])
+#     submit = SubmitField('Submit')
+
 class PostForm(FlaskForm):
-    title = StringField('Title', validators=[DataRequired()])
-    content = CKEditorField('Content', validators=[DataRequired()])
-    submit = SubmitField('Submit')
+    title = StringField('Title')
+    body = CKEditorField('Body', validators=[DataRequired()])
+    submit = SubmitField()
+
+
+

@@ -1,14 +1,20 @@
 import json
-from flask import Blueprint, render_template, request, flash, jsonify, redirect, url_for
+from flask import Blueprint, render_template, request, flash, jsonify, redirect, url_for, send_from_directory
 from flask_login import login_required, current_user
+
 from . import db
 from .models import Group, Note, GroupForm, PostForm, Post, User
-
+from flask_ckeditor import upload_success, upload_fail
+from werkzeug.utils import secure_filename
+import uuid as uuid
+import os
 
 views = Blueprint('views', __name__)
+basedir = os.path.abspath(os.path.dirname(__file__))
 
 
 @views.route('/', methods=['GET', 'POST'])
+# @views.route('/home', methods=['GET', 'POST'])
 @login_required
 def home():
     subscribed_groups = current_user.subscriptions
@@ -110,11 +116,64 @@ def group_content(group_id):
 
     if form.validate_on_submit():
         title = form.title.data
-        content = form.content.data
-        post = Post(title=title, content=content, user_id=current_user.id, group_id=group_id)
+        body = form.body.data
+        post = Post(title=title, content=body, user_id=current_user.id, group_id=group_id)
         db.session.add(post)
         db.session.commit()
         flash('Post created successfully', 'success')
         return redirect(url_for('views.group_content', group_id=group_id))
 
     return render_template('group_content.html', form=form, group=group, user=current_user, posts=posts)
+
+# @views.route('/', methods=['GET', 'POST'])
+# def index():
+#     form = PostForm()
+#     if form.validate_on_submit():
+#         title = form.title.data
+#         body = form.body.data
+#         # WARNING: use bleach or something similar to clean the data (escape JavaScript code)
+#         # You may need to store the data in database here
+#         return render_template('post.html', title=title, body=body)
+#     return render_template('index.html', form=form)
+
+# @views.route('/files/<path:filename>')
+# @login_required
+# def uploaded_files(filename):
+#     path = os.path.join(basedir, 'uploads')
+#     return send_from_directory(path, filename)
+#
+#
+# @views.route('/upload', methods=['POST'])
+# def upload():
+#     f = request.files.get('upload')
+#
+#     extension = f.filename.split('.')[-1].lower()
+#     if extension not in ['jpg', 'gif', 'png', 'jpeg']:
+#         return upload_fail(message='Image only!')
+#
+#     pic_filename = secure_filename(f.filename)
+#     pic_name = str(uuid.uuid1()) + '_' + pic_filename
+#     f.save(os.path.join(os.path.join(basedir, 'uploads'), pic_name))
+#     url = url_for('views/uploaded_files', filename=f.filename)
+#     return upload_success(url, filename=f.filename)  # return upload_success call
+
+
+
+@views.route('/files/<filename>')
+def uploaded_files(filename):
+    # path = app.config['UPLOADED_PATH']
+    path = os.path.join(basedir, 'uploads')
+    return send_from_directory(path, filename)
+
+
+@views.route('/upload', methods=['POST'])
+def upload():
+    f = request.files.get('upload')
+    extension = f.filename.split('.')[-1].lower()
+    if extension not in ['jpg', 'gif', 'png', 'jpeg']:
+        return upload_fail(message='Image only!')
+    pic_filename = secure_filename(f.filename)
+    pic_name = str(uuid.uuid1()) + '_' + pic_filename
+    f.save(os.path.join(os.path.join(basedir, 'uploads'), pic_name))
+    url = url_for('views.uploaded_files', filename=pic_name)
+    return upload_success(url, filename=pic_name)
