@@ -117,6 +117,8 @@ def group_content(group_id):
     if form.validate_on_submit():
         title = form.title.data
         body = form.body.data
+        print('body: ', body)
+
         post = Post(title=title, content=body, user_id=current_user.id, group_id=group_id)
         db.session.add(post)
         db.session.commit()
@@ -125,41 +127,9 @@ def group_content(group_id):
 
     return render_template('group_content.html', form=form, group=group, user=current_user, posts=posts)
 
-# @views.route('/', methods=['GET', 'POST'])
-# def index():
-#     form = PostForm()
-#     if form.validate_on_submit():
-#         title = form.title.data
-#         body = form.body.data
-#         # WARNING: use bleach or something similar to clean the data (escape JavaScript code)
-#         # You may need to store the data in database here
-#         return render_template('post.html', title=title, body=body)
-#     return render_template('index.html', form=form)
-
-# @views.route('/files/<path:filename>')
-# @login_required
-# def uploaded_files(filename):
-#     path = os.path.join(basedir, 'uploads')
-#     return send_from_directory(path, filename)
-#
-#
-# @views.route('/upload', methods=['POST'])
-# def upload():
-#     f = request.files.get('upload')
-#
-#     extension = f.filename.split('.')[-1].lower()
-#     if extension not in ['jpg', 'gif', 'png', 'jpeg']:
-#         return upload_fail(message='Image only!')
-#
-#     pic_filename = secure_filename(f.filename)
-#     pic_name = str(uuid.uuid1()) + '_' + pic_filename
-#     f.save(os.path.join(os.path.join(basedir, 'uploads'), pic_name))
-#     url = url_for('views/uploaded_files', filename=f.filename)
-#     return upload_success(url, filename=f.filename)  # return upload_success call
-
-
 
 @views.route('/files/<filename>')
+@login_required
 def uploaded_files(filename):
     # path = app.config['UPLOADED_PATH']
     path = os.path.join(basedir, 'uploads')
@@ -167,6 +137,7 @@ def uploaded_files(filename):
 
 
 @views.route('/upload', methods=['POST'])
+@login_required
 def upload():
     f = request.files.get('upload')
     extension = f.filename.split('.')[-1].lower()

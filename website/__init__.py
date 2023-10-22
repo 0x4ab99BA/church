@@ -4,7 +4,7 @@ from os import path
 from flask_login import LoginManager
 from flask_ckeditor import CKEditor, upload_fail, upload_success, CKEditorField
 import os
-
+from flask_wtf.csrf import CSRFProtect
 db = SQLAlchemy()
 DB_NAME = "database.db"
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -23,12 +23,11 @@ def create_app():
     app.config['CKEDITOR_HEIGHT'] = 400
     app.config['CKEDITOR_FILE_UPLOADER'] = 'views.upload'
     app.config['UPLOADED_PATH'] = os.path.join(basedir, 'uploads')
+    # app.config['CKEDITOR_ENABLE_CSRF'] = True
 
     db.init_app(app)
     ckeditor = CKEditor(app)
     # csrf = CSRFProtect(app)
-    # ckeditor.init_app(app)
-    # ckeditor = CKEditor(app)
 
     from .views import views
     from .auth import auth
