@@ -46,7 +46,6 @@ class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(150), nullable=False)
     content = db.Column(db.Text, nullable=False)
-    image = db.Column(db.String(255))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)  # ForeignKey to link Post and User
     group_id = db.Column(db.Integer, db.ForeignKey('group.id'), nullable=False)  # ForeignKey to link Post and Group
     created_at = db.Column(db.DateTime, default=datetime.now)

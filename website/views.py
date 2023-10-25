@@ -131,7 +131,6 @@ def group_content(group_id):
 @views.route('/files/<filename>')
 @login_required
 def uploaded_files(filename):
-    # path = app.config['UPLOADED_PATH']
     path = os.path.join(basedir, 'uploads')
     return send_from_directory(path, filename)
 
@@ -141,6 +140,20 @@ def uploaded_files(filename):
 def upload():
     f = request.files.get('upload')
     extension = f.filename.split('.')[-1].lower()
+    if extension not in ['pdf']:
+        return upload_fail(message='PDF only!')
+    pic_filename = secure_filename(f.filename)
+    pic_name = str(uuid.uuid1()) + '_' + pic_filename
+    f.save(os.path.join(os.path.join(basedir, 'uploads'), pic_name))
+    url = url_for('views.uploaded_files', filename=pic_name)
+    return upload_success(url, filename=pic_name)
+
+
+@views.route('/upload_image', methods=['POST'])
+@login_required
+def upload_image():
+    f = request.files.get('upload')
+    extension = f.filename.split('.')[-1].lower()
     if extension not in ['jpg', 'gif', 'png', 'jpeg']:
         return upload_fail(message='Image only!')
     pic_filename = secure_filename(f.filename)
@@ -148,3 +161,9 @@ def upload():
     f.save(os.path.join(os.path.join(basedir, 'uploads'), pic_name))
     url = url_for('views.uploaded_files', filename=pic_name)
     return upload_success(url, filename=pic_name)
+
+
+@views.errorhandler(413)
+@login_required
+def too_large(e):
+    return upload_fail(message='File is too large!')
