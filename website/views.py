@@ -1,9 +1,12 @@
 import json
 from flask import Blueprint, render_template, request, flash, jsonify, redirect, url_for, send_from_directory
 from flask_login import login_required, current_user
+from bs4 import BeautifulSoup
+from sqlalchemy.exc import IntegrityError
+import os
 
 from . import db
-from .models import Group, Note, GroupForm, PostForm, Post, User
+from .models import Group, Note, GroupForm, PostForm, Post, User, File
 from flask_ckeditor import upload_success, upload_fail
 from werkzeug.utils import secure_filename
 import uuid as uuid
@@ -17,7 +20,6 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 # @views.route('/home', methods=['GET', 'POST'])
 @login_required
 def home():
-
     if current_user.is_authenticated:
         subscribed_groups = current_user.subscriptions
 
@@ -111,17 +113,38 @@ def unsubscribe(group_id):
 def group_content(group_id):
     group = Group.query.get(group_id)
     form = PostForm()
-    posts = Post.query.filter_by(group_id=group_id).all()
+    posts = Post.query.filter_by(group_id=group_id).order_by(Post.created_at.desc()).all()
 
     if form.validate_on_submit():
         title = form.title.data
         body = form.body.data
-        print('body: ', body)
+        # print('body: ', body)
 
         post = Post(title=title, content=body, user_id=current_user.id, group_id=group_id)
         db.session.add(post)
         db.session.commit()
+
+        uploaded_images_and_files = []
+
+        soup = BeautifulSoup(body, 'html.parser')
+        a_tags = soup.find_all('a')
+        href_contents = [a['href'].replace('/files/', '') for a in a_tags if a.get('href', '').startswith('/files/')]
+
+        uploaded_images_and_files.extend(href_contents)
+
+        img_tags = soup.find_all('img')
+        src_contents = [img['src'].replace('/files/', '') for img in img_tags if
+                        img.get('src', '').startswith('/files/')]
+
+        uploaded_images_and_files.extend(src_contents)
+
+        for content in uploaded_images_and_files:
+            file = File(content=content, post_id=post.id)
+            db.session.add(file)
+            db.session.commit()
+
         flash('Post created successfully', 'success')
+
         return redirect(url_for('views.group_content', group_id=group_id))
 
     return render_template('group_content.html', form=form, group=group, user=current_user, posts=posts)
@@ -166,3 +189,31 @@ def upload_image():
 @login_required
 def too_large(e):
     return upload_fail(message='File is too large!')
+
+
+@views.route('/delete_post', methods=['POST'])
+@login_required
+def delete_post():
+    post = json.loads(request.data)
+    post_id = post['postId']
+    post_to_delete = db.session.query(Post).filter_by(id=post_id).first()
+
+    if post_to_delete:
+        if post_to_delete.user_id == current_user.id:
+            try:
+                for file in post_to_delete.files:
+                    file_path = os.path.join(basedir, 'uploads', file.content)
+                    try:
+                        if os.path.isfile(file_path):
+                            os.remove(file_path)
+                    except Exception as e:
+                        pass
+                    db.session.delete(file)
+                db.session.delete(post_to_delete)
+                db.session.commit()
+            except IntegrityError:
+                db.session.rollback()
+        else:
+            flash("Cannot delete other's post.", category='error')
+
+    return jsonify({'success': True})

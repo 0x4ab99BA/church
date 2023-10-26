@@ -50,8 +50,18 @@ class Post(db.Model):
     group_id = db.Column(db.Integer, db.ForeignKey('group.id'), nullable=False)  # ForeignKey to link Post and Group
     created_at = db.Column(db.DateTime, default=datetime.now)
 
+    files = db.relationship('File', back_populates='post')
     user = db.relationship('User', back_populates='posts')
     group = db.relationship('Group', back_populates='posts')
+
+
+class File(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    content = db.Column(db.Text, nullable=False)
+
+    post_id = db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False)
+    post = db.relationship('Post', back_populates='files')
+
 
 
 class BannerUploadForm(FlaskForm):
@@ -70,7 +80,3 @@ class PostForm(FlaskForm):
     title = StringField('Title', validators=[DataRequired()])
     body = CKEditorField('Body', validators=[DataRequired()])
     submit = SubmitField('Submit')
-
-
-
-
