@@ -2,33 +2,114 @@
 
 {% block content %}
 
-    <h1 align="center">{{ group.name }} </h1>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.1/css/all.css">
+    <style>
+        .btn-head {
+            background-color: #f8f9fa;
+        }
 
-    <h2>Posts</h2>
-    <ul>
-        {% for post in posts %}
-            <li>
-                <h3>{{ post.title }}</h3>
-                <p>{{ post.content|safe }}</p>
-            </li>
-        {% endfor %}
-    </ul>
+        .btn-footer {
+        font-size: 22px; /* 调整图标大小 */
+        background-color: transparent; /* 设置背景色为透明 */
+        }
 
-    <h2>Create a Post</h2>
-    <form method="POST" enctype="multipart/form-data">
-        {{ form.hidden_tag() }}
-        <div class="form-group">
-            {{ form.title.label(class="form-control-label") }}
-            {{ form.title(class="form-control") }}
+        .card-footer {
+            display: flex;
+            justify-content: space-around;
+        }
+        .icon-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 50%;
+        }
+
+        .more-button {
+            float: right;
+            display: block;
+            border: none;
+            background: none;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+    </style>
+
+    <script>
+        function toggleContent(button) {
+            let cardBody = button.parentElement;
+            let postContent = cardBody.querySelector(".post-content");
+
+            if (postContent.style.maxHeight) {
+                postContent.style.maxHeight = null;
+                button.textContent = "View less";
+            } else {
+                postContent.style.maxHeight = "745px"; // Set your desired max height here
+                button.textContent = "View more";
+            }
+        }
+
+        window.addEventListener('load', function () {
+            let postContents = document.querySelectorAll('.post-content');
+
+            postContents.forEach(function (postContent) {
+                if (postContent.scrollHeight <= 745) {
+                    let moreButton = postContent.parentElement.querySelector(".more-button");
+                    moreButton.style.display = 'none';
+                }
+            });
+        });
+    </script>
+
+    {% for post in posts %}
+        <div class="container">
+            <div class="card mt-5">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">{{ post.title }}</h5>
+                    <div>
+                        <button type="button" class="btn btn-head"><i class="far fa-edit"></i></button>
+                        <button type="button" class="btn btn-head"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="post-content" style="max-height: 745px; overflow: hidden;">
+                        <p class="card-text">{{ post.content|safe }}</p>
+                    </div>
+                    <button class="more-button" onclick="toggleContent(this)">View more</button>
+                </div>
+                <div class="card-footer">
+                    <div class="icon-container">
+                        <button type="button" class="btn btn-footer"><i class="far fa-thumbs-up"></i></button> Like
+                    </div>
+                    <div class="icon-container">
+                        <button type="button" class="btn btn-footer"><i class="far fa-comment"></i></button> Comment
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="form-group">
-            {{ form.body.label(class="form-control-label") }}
-            {{ form.body(class="form-control") }}
-        </div>
-        <div class="form-group">
-            {{ form.submit(class="btn btn-primary") }}
-        </div>
-    </form>
+    {% endfor %}
+
+    <br>
+    <br>
+
+    <div class="container">
+        <form method="POST" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+                {{ form.title.label(class="form-control-label") }}
+                {{ form.title(class="form-control") }}
+            </div>
+            <div class="form-group">
+                {{ form.body.label(class="form-control-label") }}
+                {{ form.body(class="form-control") }}
+            </div>
+            <div class="form-group">
+                {{ form.submit(class="btn btn-primary") }}
+            </div>
+        </form>
+    </div>
+
 
     <script src="/static/ckeditor/ckeditor.js"></script>
     <script>
