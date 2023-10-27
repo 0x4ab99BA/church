@@ -56,10 +56,16 @@ def delete_note():
 @login_required
 def groups():
     page = request.args.get('page', 1, type=int)
-    per_page = 4  # Number of items per page
+    per_page = 6  # Number of items per page
 
     groups = Group.query.paginate(page=page, per_page=per_page)
     return render_template("groups.html", user=current_user, groups=groups)
+
+
+@views.route('/admin', methods=['GET', 'POST'])
+@login_required
+def admin():
+    return render_template("admin.html", user=current_user)
 
 
 @views.route('/create_group', methods=['GET', 'POST'])
@@ -112,7 +118,11 @@ def unsubscribe(group_id):
 def group_content(group_id):
     group = Group.query.get(group_id)
     form = PostForm()
-    posts = Post.query.filter_by(group_id=group_id).order_by(Post.created_at.desc()).all()
+
+    page = request.args.get('page', 1, type=int)
+    posts = Post.query.filter_by(group_id=group_id).order_by(Post.created_at.desc()).paginate(page=page, per_page=10)
+
+    # posts = Post.query.filter_by(group_id=group_id).order_by(Post.created_at.desc()).all()
 
     if form.validate_on_submit():
         title = form.title.data

@@ -1,0 +1,36 @@
+{% extends "base.html" %} {% block title %}Home{% endblock %}
+{% block content %}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.1/css/all.css">
+    <style>
+        .container_create_group {
+            display: flex;
+            align-items: center;
+        }
+
+        .container_create_group a.btn.btn-primary {
+            margin-left: 20px;  /* 向右移动+ */
+        }
+
+        .container_create_group .text {
+            margin-left: 20px;  /* 向右移动标题和内容 */
+        }
+
+        .container_create_group .text .title {
+            font-size: 2em;  /* 放大Create a group */
+        }
+    </style>
+
+    <br>
+    <br>
+
+    <div class="container_create_group", {% if not user.admin %}style="display: none;"{% endif %}>
+        <a href="{{ url_for('views.create_group') }}" class="btn btn-primary">+</a>
+        <div class="text">
+            <div class="title">Creat Group</div>
+            <div class="content">Description of the purpose and meeting place of the group</div>
+        </div>
+    </div>
+
+
+{% endblock %}

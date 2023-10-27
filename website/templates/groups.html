@@ -6,36 +6,7 @@
         .group {
             margin-bottom: 1rem; /* 这将在每个组之间添加1rem的空间 */
         }
-
-        .container_create_group {
-            display: flex;
-            align-items: center;
-        }
-
-        .container_create_group a.btn.btn-primary {
-            margin-left: 20px;  /* 向右移动+ */
-        }
-
-        .container_create_group .text {
-            margin-left: 20px;  /* 向右移动标题和内容 */
-        }
-
-        .container_create_group .text .title {
-            font-size: 2em;  /* 放大Create a group */
-        }
     </style>
-
-
-    <div class="container_create_group", {% if not user.admin %}style="display: none;"{% endif %}>
-        <br>
-        <br>
-        <a href="{{ url_for('views.create_group') }}" class="btn btn-primary">+</a>
-        <div class="text">
-            <div class="title">Creat Group</div>
-            <div class="content">Description of the purpose and meeting place of the group</div>
-        </div>
-    </div>
-
 
     <div class="container">
         <br>
