@@ -4,8 +4,10 @@ from os import path
 from flask_login import LoginManager
 from flask_ckeditor import CKEditor, upload_fail, upload_success, CKEditorField
 import os
-# from flask_wtf.csrf import CSRFProtect
+from flask_migrate import Migrate
+
 db = SQLAlchemy()
+
 DB_NAME = "database.db"
 basedir = os.path.abspath(os.path.dirname(__file__))
 ckeditor = CKEditor()
@@ -30,6 +32,7 @@ def create_app():
     db.init_app(app)
     ckeditor.init_app(app)
     # csrf = CSRFProtect(app)
+    migrate = Migrate(app, db)
 
     from .views import views
     from .auth import auth

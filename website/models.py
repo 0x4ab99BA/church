@@ -27,6 +27,7 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(150), unique=True)
     password = db.Column(db.String(150))
     first_name = db.Column(db.String(150))
+    admin = db.Column(db.Boolean, default=False)
     notes = db.relationship('Note')
     subscriptions = db.relationship('Group', secondary=user_group, back_populates='subscribers')
     posts = db.relationship('Post', back_populates='user')  # Add this line to establish the relationship with Post

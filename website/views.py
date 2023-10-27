@@ -3,7 +3,6 @@ from flask import Blueprint, render_template, request, flash, jsonify, redirect,
 from flask_login import login_required, current_user
 from bs4 import BeautifulSoup
 from sqlalchemy.exc import IntegrityError
-import os
 
 from . import db
 from .models import Group, Note, GroupForm, PostForm, Post, User, File
@@ -199,7 +198,7 @@ def delete_post():
     post_to_delete = db.session.query(Post).filter_by(id=post_id).first()
 
     if post_to_delete:
-        if post_to_delete.user_id == current_user.id:
+        if post_to_delete.user_id == current_user.id or current_user.admin:
             try:
                 for file in post_to_delete.files:
                     file_path = os.path.join(basedir, 'uploads', file.content)
