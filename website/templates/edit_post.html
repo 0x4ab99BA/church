@@ -14,7 +14,7 @@
             </div>
             <div class="form-group">
                 {{ form.body.label(class="form-control-label") }}
-                {{ form.body(class="form-control") }}
+                {{ form.body(class="form-control")|safe }}
             </div>
             <div class="form-group">
                 {{ form.submit(class="btn btn-primary") }}
@@ -28,7 +28,10 @@
         CKEDITOR.replace( '{{ form.body.id }}', {
             extraPlugins: 'filebrowser',
             filebrowserImageUploadUrl: '/upload_image',
-            filebrowserUploadUrl: '/upload'
+            filebrowserUploadUrl: '/upload',
+            allowedContent: true,
+            extraAllowedContent: 'iframe[*]',
+            height: 450
         });
     </script>
 

@@ -162,12 +162,14 @@ def edit_post(group_id, post_id):
 def show_post(post_id, group_id):
     # 根据post_id查询帖子对象
     post = Post.query.get_or_404(post_id)
+    group_id = post.group_id
+    group = Group.query.get_or_404(group_id)
 
     # 查询该帖子下的所有一级评论（即没有父评论的评论）
-    comments = Comment.query.filter_by(post_id=post_id, parent_id=None).all()
+    # comments = Comment.query.filter_by(post_id=post_id, parent_id=None).all()
 
     # 渲染一个模板，传入帖子对象和评论列表
-    return render_template('post.html', post=post, comments=comments)
+    return render_template('post.html', post=post, user=current_user, group=group)
 
 
 @post_views.route('/like_post', methods=['POST'])

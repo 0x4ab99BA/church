@@ -1,100 +1,82 @@
-{#<!DOCTYPE html>#}
-{#<html lang="en">#}
-{#<head>#}
-{# 	<meta charset="UTF-8">#}
-{# 	<title>Flask-CKEditor Demo</title>#}
-{#</head>#}
-{#<body>#}
-{#	<div class="warpper" style="width: 700px; margin: auto">#}
-{#		<h1>{{ title }}</h1>#}
-{#		<hr>#}
-{#		<p>{{ body|safe }}</p>#}
-{#		<hr>#}
-{#		<a href="{{ url_for('index') }}">Back Home</a>#}
-{#	</div>#}
-{#</body>#}
-{#</html>#}
+{% extends "base.html" %} {% block title %}Home{% endblock %}
 
-<!-- 定义一个模板，用于显示帖子详情和评论列表 -->
-<html>
-<head>
+{% block content %}
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.1/css/all.css">
     <style>
-        /* 定义一些样式，使页面更美观 */
-        .post {
-            border: 1px solid black;
-            padding: 10px;
-            margin: 10px;
+        .btn-head {
+            background-color: #f8f9fa;
         }
 
-        .comment {
-            border: 1px solid gray;
-            padding: 10px;
-            margin: 10px;
+        .btn-footer {
+        font-size: 22px; /* 调整图标大小 */
+        background-color: transparent; /* 设置背景色为透明 */
         }
 
-        .comment-form {
-            border: 1px solid green;
-            padding: 10px;
-            margin: 10px;
+        .card-footer {
+            display: flex;
+            justify-content: space-around;
         }
+        .icon-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 50%;
+        }
+
+        .more-button {
+            float: right;
+            display: block;
+            border: none;
+            background: none;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
     </style>
-</head>
-<body>
-    <!-- 显示帖子的标题，内容，作者，时间等信息 -->
-    <div class="post">
-        <h3>{{ post.title }}</h3>
-        <p>{{ post.content }}</p>
-        <p>Posted by {{ post.user.first_name }} on {{ post.created_at }}</p>
-    </div>
 
-    <!-- 显示评论列表 -->
-    <div class="comments">
-        {% for comment in comments %}
-            <!-- 调用一个宏，用于递归地显示评论和子评论 -->
-            {{ show_comment(comment) }}
-        {% endfor %}
-    </div>
+    <script src="{{ url_for('static', filename='deletePostAndFiles.js') }}"></script>
+    <script src="{{ url_for('static', filename='view_more.js') }}"></script>
+    <script src="{{ url_for('static', filename='likePost.js') }}"></script>
 
-    <!-- 定义一个宏，用于递归地显示评论和子评论 -->
-    {% macro show_comment(comment) %}
-        <!-- 显示评论的内容，作者，时间等信息 -->
-        <div class="comment">
-            <p>{{ comment.body }}</p>
-            <p>Commented by {{ comment.user.first_name }} on {{ comment.timestamp }}</p>
-
-            <!-- 显示一个表单，用于回复该评论 -->
-            <div class="comment-form">
-                <form action="{{ url_for('add_comment') }}" method="post">
-                    <!-- 隐藏域，用于传递用户id，帖子id，父评论id -->
-                    <input type="hidden" name="user_id" value="{{ comment.user.id }}">
-                    <input type="hidden" name="post_id" value="{{ comment.post.id }}">
-                    <input type="hidden" name="parent_id" value="{{ comment.id }}">
-                    <!-- 文本域，用于输入回复内容 -->
-                    <textarea name="body" rows="3" cols="50"></textarea>
-                    <!-- 提交按钮，用于提交回复表单 -->
-                    <button type="submit">Reply</button>
-                </form>
+    <div class="container">
+        <div class="card mt-5">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">{{ post.title }}</h5>
+                <div>
+                    <a href="{{ url_for('post_views.edit_post', group_id=group.id, post_id=post.id) }}">
+                        <button type="button" class="btn btn-head">
+                            <i class="far fa-edit"></i>
+                        </button>
+                    </a>
+                    <button type="button" class="btn btn-head" onclick="deletePostAndFiles({{ post.id }})"><i class="fas fa-trash-alt"></i></button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="post-content" style="max-height: 745px; overflow: hidden;">
+                    <p class="card-text">{{ post.content|safe }}</p>
+                </div>
+                <button class="more-button" onclick="toggleContent(this)">View more</button>
             </div>
 
-            <!-- 显示该评论的所有子评论 -->
-            {% for child in comment.children %}
-                {{ show_comment(child) }}
-            {% endfor %}
+            <div class="card-footer">
+                <div class="icon-container">
+                    <button type="button" class="btn btn-footer" onclick="likePost({{ post.id }})">
+                        <i class="far fa-thumbs-up"></i>
+                    </button>
+                    <span id="like-count-{{ post.id }}">{{ post.like_count() }}</span>
+                </div>
+                <div class="icon-container">
+                    <button type="button" class="btn btn-footer">
+                        <i class="far fa-comment"></i>
+                    </button> Comment
+                </div>
+            </div>
         </div>
-    {% endmacro %}
-
-    <!-- 显示一个表单，用于发表对帖子的评论 -->
-    <div class="comment-form">
-        <form action="{{ url_for('add_comment') }}" method="post">
-            <!-- 隐藏域，用于传递用户id，帖子id -->
-            <input type="hidden" name="user_id" value="{{ post.user.id }}">
-            <input type="hidden" name="post_id" value="{{ post.id }}">
-            <!-- 文本域，用于输入评论内容 -->
-            <textarea name="body" rows="3" cols="50"></textarea>
-            <!-- 提交按钮，用于提交评论表单 -->
-            <button type="submit">Comment</button>
-        </form>
     </div>
 
-</body>
-</html>
+{% endblock %}
+
+
+
