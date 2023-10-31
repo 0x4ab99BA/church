@@ -1,16 +1,100 @@
-<!DOCTYPE html>
-<html lang="en">
+{#<!DOCTYPE html>#}
+{#<html lang="en">#}
+{#<head>#}
+{# 	<meta charset="UTF-8">#}
+{# 	<title>Flask-CKEditor Demo</title>#}
+{#</head>#}
+{#<body>#}
+{#	<div class="warpper" style="width: 700px; margin: auto">#}
+{#		<h1>{{ title }}</h1>#}
+{#		<hr>#}
+{#		<p>{{ body|safe }}</p>#}
+{#		<hr>#}
+{#		<a href="{{ url_for('index') }}">Back Home</a>#}
+{#	</div>#}
+{#</body>#}
+{#</html>#}
+
+<!-- 定义一个模板，用于显示帖子详情和评论列表 -->
+<html>
 <head>
- 	<meta charset="UTF-8">
- 	<title>Flask-CKEditor Demo</title>
+    <style>
+        /* 定义一些样式，使页面更美观 */
+        .post {
+            border: 1px solid black;
+            padding: 10px;
+            margin: 10px;
+        }
+
+        .comment {
+            border: 1px solid gray;
+            padding: 10px;
+            margin: 10px;
+        }
+
+        .comment-form {
+            border: 1px solid green;
+            padding: 10px;
+            margin: 10px;
+        }
+    </style>
 </head>
 <body>
-	<div class="warpper" style="width: 700px; margin: auto">
-		<h1>{{ title }}</h1>
-		<hr>
-		<p>{{ body|safe }}</p>
-		<hr>
-		<a href="{{ url_for('index') }}">Back Home</a>
-	</div>
+    <!-- 显示帖子的标题，内容，作者，时间等信息 -->
+    <div class="post">
+        <h3>{{ post.title }}</h3>
+        <p>{{ post.content }}</p>
+        <p>Posted by {{ post.user.first_name }} on {{ post.created_at }}</p>
+    </div>
+
+    <!-- 显示评论列表 -->
+    <div class="comments">
+        {% for comment in comments %}
+            <!-- 调用一个宏，用于递归地显示评论和子评论 -->
+            {{ show_comment(comment) }}
+        {% endfor %}
+    </div>
+
+    <!-- 定义一个宏，用于递归地显示评论和子评论 -->
+    {% macro show_comment(comment) %}
+        <!-- 显示评论的内容，作者，时间等信息 -->
+        <div class="comment">
+            <p>{{ comment.body }}</p>
+            <p>Commented by {{ comment.user.first_name }} on {{ comment.timestamp }}</p>
+
+            <!-- 显示一个表单，用于回复该评论 -->
+            <div class="comment-form">
+                <form action="{{ url_for('add_comment') }}" method="post">
+                    <!-- 隐藏域，用于传递用户id，帖子id，父评论id -->
+                    <input type="hidden" name="user_id" value="{{ comment.user.id }}">
+                    <input type="hidden" name="post_id" value="{{ comment.post.id }}">
+                    <input type="hidden" name="parent_id" value="{{ comment.id }}">
+                    <!-- 文本域，用于输入回复内容 -->
+                    <textarea name="body" rows="3" cols="50"></textarea>
+                    <!-- 提交按钮，用于提交回复表单 -->
+                    <button type="submit">Reply</button>
+                </form>
+            </div>
+
+            <!-- 显示该评论的所有子评论 -->
+            {% for child in comment.children %}
+                {{ show_comment(child) }}
+            {% endfor %}
+        </div>
+    {% endmacro %}
+
+    <!-- 显示一个表单，用于发表对帖子的评论 -->
+    <div class="comment-form">
+        <form action="{{ url_for('add_comment') }}" method="post">
+            <!-- 隐藏域，用于传递用户id，帖子id -->
+            <input type="hidden" name="user_id" value="{{ post.user.id }}">
+            <input type="hidden" name="post_id" value="{{ post.id }}">
+            <!-- 文本域，用于输入评论内容 -->
+            <textarea name="body" rows="3" cols="50"></textarea>
+            <!-- 提交按钮，用于提交评论表单 -->
+            <button type="submit">Comment</button>
+        </form>
+    </div>
+
 </body>
 </html>

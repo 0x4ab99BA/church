@@ -35,6 +35,7 @@
 
     <script src="{{ url_for('static', filename='view_more.js') }}"></script>
     <script src="{{ url_for('static', filename='deletePostAndFiles.js') }}"></script>
+    <script src="{{ url_for('static', filename='likePost.js') }}"></script>
 
     {% for post in latest_posts %}
         <div class="container">
@@ -56,12 +57,18 @@
                     </div>
                     <button class="more-button" onclick="toggleContent(this)">View more</button>
                 </div>
+
                 <div class="card-footer">
                     <div class="icon-container">
-                        <button type="button" class="btn btn-footer"><i class="far fa-thumbs-up"></i></button> Like
+                        <button type="button" class="btn btn-footer" onclick="likePost({{ post.id }})">
+                            <i class="far fa-thumbs-up"></i>
+                        </button>
+                        <span id="like-count-{{ post.id }}">{{ post.like_count() }}</span>
                     </div>
                     <div class="icon-container">
-                        <button type="button" class="btn btn-footer"><i class="far fa-comment"></i></button> Comment
+                        <button type="button" class="btn btn-footer">
+                            <i class="far fa-comment"></i>
+                        </button> Comment
                     </div>
                 </div>
             </div>

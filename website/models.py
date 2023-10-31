@@ -54,6 +54,10 @@ class Post(db.Model):
     files = db.relationship('File', back_populates='post')
     user = db.relationship('User', back_populates='posts')
     group = db.relationship('Group', back_populates='posts')
+    likes = db.relationship('Like', backref='post', lazy='dynamic')
+
+    def like_count(self):
+        return self.likes.count()
 
 
 class File(db.Model):
@@ -62,12 +66,6 @@ class File(db.Model):
 
     post_id = db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False)
     post = db.relationship('Post', back_populates='files')
-
-
-
-class BannerUploadForm(FlaskForm):
-    banner = FileField('Upload Banner Image', validators=[FileAllowed(['jpg', 'png', 'jpeg'], 'Images only!')])
-    submit = SubmitField('Upload')
 
 
 class GroupForm(FlaskForm):
@@ -81,3 +79,23 @@ class PostForm(FlaskForm):
     title = StringField('Title', validators=[DataRequired()])
     body = CKEditorField('Body', validators=[DataRequired()])
     submit = SubmitField('Submit')
+
+
+class Comment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    body = db.Column(db.Text, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)  # 评论者的用户id
+    post_id = db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False)  # 评论的帖子id
+    parent_id = db.Column(db.Integer, db.ForeignKey('comment.id'))  # 评论的父评论id，如果是针对帖子的评论，则为None
+    timestamp = db.Column(db.DateTime, default=datetime.now)  # 评论时间
+
+    user = db.relationship('User', backref='comments')  # 与User模型建立关系，方便查询评论者信息
+    post = db.relationship('Post', backref='comments')  # 与Post模型建立关系，方便查询评论所属的帖子信息
+    parent = db.relationship('Comment', remote_side=[id], backref='children')
+
+
+class Like(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    post_id = db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False)
+    __table_args__ = (db.UniqueConstraint('user_id', 'post_id'),)

@@ -4,7 +4,7 @@ from flask_login import login_required, current_user
 from bs4 import BeautifulSoup
 
 from . import db
-from .models import Group, PostForm, Post, File
+from .models import Group, PostForm, Post, File, Comment, Like
 from flask_ckeditor import upload_success, upload_fail
 from werkzeug.utils import secure_filename
 import uuid as uuid
@@ -155,3 +155,61 @@ def edit_post(group_id, post_id):
     form.body.data = post.content
 
     return render_template('edit_post.html', form=form, group=group, user=current_user, post=post)
+
+
+@post_views.route('/group/<int:group_id>/show_post/<int:post_id>')
+@login_required
+def show_post(post_id, group_id):
+    # 根据post_id查询帖子对象
+    post = Post.query.get_or_404(post_id)
+
+    # 查询该帖子下的所有一级评论（即没有父评论的评论）
+    comments = Comment.query.filter_by(post_id=post_id, parent_id=None).all()
+
+    # 渲染一个模板，传入帖子对象和评论列表
+    return render_template('post.html', post=post, comments=comments)
+
+
+@post_views.route('/like_post', methods=['POST'])
+@login_required
+def like_post():
+    data = json.loads(request.data)
+    post_id = data['postId']
+
+    post = Post.query.get_or_404(post_id)
+    liked = Like.query.filter_by(user_id=current_user.id, post_id=post_id).first()
+
+    if not liked:
+        like = Like(user_id=current_user.id, post_id=post_id)
+        db.session.add(like)
+        db.session.commit()
+        likes = post.like_count()
+
+        return jsonify({'status': 'success', 'updatedLikeCount': likes})
+
+    else:
+        db.session.delete(liked)
+        db.session.commit()
+        likes = post.like_count()
+
+        return jsonify({'status': 'success', 'updatedLikeCount': likes})
+
+
+@post_views.route('/comment', methods=['POST'])
+@login_required
+def add_comment():
+    # 获取表单中提交的数据
+    body = request.form.get('body')  # 评论内容
+    user_id = request.form.get('user_id')  # 评论者的用户id
+    post_id = request.form.get('post_id')  # 评论的帖子id
+    parent_id = request.form.get('parent_id')  # 评论的父评论id
+
+    # 创建一个Comment对象，并赋值相应的属性
+    comment = Comment(body=body, user_id=user_id, post_id=post_id, parent_id=parent_id)
+
+    # 将Comment对象添加到数据库会话中，并提交到数据库
+    db.session.add(comment)
+    db.session.commit()
+
+    # 重定向到帖子详情页面，显示最新的评论列表
+    return redirect(url_for('post_views.show_post', post_id=post_id))
