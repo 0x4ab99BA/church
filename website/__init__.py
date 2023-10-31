@@ -4,7 +4,6 @@ from os import path
 from flask_login import LoginManager
 from flask_ckeditor import CKEditor, upload_fail, upload_success, CKEditorField
 import os
-from flask_migrate import Migrate
 
 db = SQLAlchemy()
 
@@ -24,7 +23,7 @@ def create_app():
     app.config['CKEDITOR_PKG_TYPE'] = 'full'
     app.config['CKEDITOR_SERVE_LOCAL'] = True
     app.config['CKEDITOR_HEIGHT'] = 400
-    app.config['CKEDITOR_FILE_UPLOADER'] = 'views.upload'
+    app.config['CKEDITOR_FILE_UPLOADER'] = 'post_views.upload'
     app.config['UPLOADED_PATH'] = os.path.join(basedir, 'uploads')
     app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024
     # app.config['CKEDITOR_ENABLE_CSRF'] = True
@@ -32,15 +31,21 @@ def create_app():
     db.init_app(app)
     ckeditor.init_app(app)
     # csrf = CSRFProtect(app)
-    migrate = Migrate(app, db)
 
-    from .views import views
     from .auth import auth
+    from .home_views import home_views
+    from .group_views import group_views
+    from .post_views import post_views
+    from .admin_views import admin_views
 
-    app.register_blueprint(views, url_prefix='/')
+    # app.register_blueprint(views, url_prefix='/')
     app.register_blueprint(auth, url_prefix='/')
+    app.register_blueprint(home_views, url_prefix='/')
+    app.register_blueprint(group_views, url_prefix='/')
+    app.register_blueprint(post_views, url_prefix='/')
+    app.register_blueprint(admin_views, url_prefix='/')
 
-    from .models import User, Note
+    from .models import User
 
     with app.app_context():
         db.create_all()

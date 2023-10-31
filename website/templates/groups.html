@@ -6,7 +6,18 @@
         .group {
             margin-bottom: 1rem; /* 这将在每个组之间添加1rem的空间 */
         }
+        .group-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .button-group {
+            display: flex;
+        }
     </style>
+
+    <script src="{{ url_for('static', filename='deleteGroupAndPosts.js') }}"></script>
 
     <div class="container">
         <br>
@@ -15,17 +26,28 @@
             {% for group in groups %}
                 <div class="col-md-6">
                     <div class="group">
-                        <h3><a href="{{ url_for('views.group_content', group_id=group.id) }}">{{ group.name }}</a></h3>
+                        <div class="group-header">
+                            <h3><a href="{{ url_for('group_views.group_content', group_id=group.id) }}">{{ group.name }}</a></h3>
+                            <div class="button-group", {% if not user.admin %} style="display: none;"{% endif %}>
+                                <a href="{{ url_for('group_views.edit_group', group_id=group.id) }}" class="btn btn-head">
+                                    <i class="far fa-edit"></i>
+                                </a>
+{#                                <button type="button" class="btn btn-head"><i class="fas fa-trash-alt"></i></button>#}
+                                <button type="button" class="btn btn-head" onclick="deleteGroupAndPosts({{ group.id }})">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </div>
                         <p>{{ group.description }}</p>
                         <p><strong>Creator:</strong> {{ group.creator }}</p>
                         <p><strong>Date:</strong> {{ group.time }}</p>
                         {% if user.is_authenticated %}
                             {% if group in user.subscriptions %}
-                                <form action="{{ url_for('views.unsubscribe', group_id=group.id) }}" method="post">
+                                <form action="{{ url_for('group_views.unsubscribe', group_id=group.id) }}" method="post">
                                     <button type="submit" class="btn btn-danger">Unsubscribe</button>
                                 </form>
                             {% else %}
-                                <form action="{{ url_for('views.subscribe', group_id=group.id) }}" method="post">
+                                <form action="{{ url_for('group_views.subscribe', group_id=group.id) }}" method="post">
                                     <button type="submit" class="btn btn-success">Subscribe</button>
                                 </form>
                             {% endif %}
@@ -42,24 +64,22 @@
             <ul class="pagination">
                 {% if groups.has_prev %}
                     <li class="page-item">
-                        <a class="page-link" href="{{ url_for('views.groups', page=groups.prev_num) }}">Previous</a>
+                        <a class="page-link" href="{{ url_for('group_views.groups', page=groups.prev_num) }}">Previous</a>
                     </li>
                 {% endif %}
                 {% for page_num in groups.iter_pages() %}
                     <li class="page-item{% if groups.page == page_num %} active{% endif %}">
-                        <a class="page-link" href="{{ url_for('views.groups', page=page_num) }}">{{ page_num }}</a>
+                        <a class="page-link" href="{{ url_for('group_views.groups', page=page_num) }}">{{ page_num }}</a>
                     </li>
                 {% endfor %}
                 {% if groups.has_next %}
                     <li class="page-item">
-                        <a class="page-link" href="{{ url_for('views.groups', page=groups.next_num) }}">Next</a>
+                        <a class="page-link" href="{{ url_for('group_views.groups', page=groups.next_num) }}">Next</a>
                     </li>
                 {% endif %}
-{#                <a href="{{ url_for('views.create_group') }}" class="btn btn-primary">+</a>#}
             </ul>
         </div>
     </div>
-
 
 
 {% endblock %}

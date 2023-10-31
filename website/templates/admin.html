@@ -25,7 +25,7 @@
     <br>
 
     <div class="container_create_group", {% if not user.admin %}style="display: none;"{% endif %}>
-        <a href="{{ url_for('views.create_group') }}" class="btn btn-primary">+</a>
+        <a href="{{ url_for('group_views.create_group') }}" class="btn btn-primary">+</a>
         <div class="text">
             <div class="title">Creat Group</div>
             <div class="content">Description of the purpose and meeting place of the group</div>
