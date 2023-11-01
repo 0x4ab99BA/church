@@ -4,7 +4,7 @@ from flask_login import login_required, current_user
 from bs4 import BeautifulSoup
 
 from . import db
-from .models import Group, PostForm, Post, File, Comment, Like
+from .models import Group, PostForm, Post, File, Comment, Like, CommentForm
 from flask_ckeditor import upload_success, upload_fail
 from werkzeug.utils import secure_filename
 import uuid as uuid
@@ -157,19 +157,29 @@ def edit_post(group_id, post_id):
     return render_template('edit_post.html', form=form, group=group, user=current_user, post=post)
 
 
-@post_views.route('/group/<int:group_id>/show_post/<int:post_id>')
+@post_views.route('/group/<int:group_id>/show_post/<int:post_id>', methods=['GET', 'POST'])
 @login_required
 def show_post(post_id, group_id):
     # 根据post_id查询帖子对象
     post = Post.query.get_or_404(post_id)
-    group_id = post.group_id
     group = Group.query.get_or_404(group_id)
 
-    # 查询该帖子下的所有一级评论（即没有父评论的评论）
-    # comments = Comment.query.filter_by(post_id=post_id, parent_id=None).all()
+    form = CommentForm()
+    comment_form = CommentForm()
 
-    # 渲染一个模板，传入帖子对象和评论列表
-    return render_template('post.html', post=post, user=current_user, group=group)
+    reversed_comments = reversed([comment for comment in post.comments if comment.parent_id is None])
+
+    if form.validate_on_submit():
+        body = form.comment_body.data
+        new_comment = Comment(body=body, user=current_user, post=post)
+        db.session.add(new_comment)
+        db.session.commit()
+        return redirect(url_for('post_views.show_post', post_id=post_id, group_id=group_id))
+
+    return render_template('post.html',
+                           post=post, user=current_user, group=group,
+                           form=form, comment_form=comment_form,
+                           reversed_comments=reversed_comments)
 
 
 @post_views.route('/like_post', methods=['POST'])
@@ -197,21 +207,55 @@ def like_post():
         return jsonify({'status': 'success', 'updatedLikeCount': likes})
 
 
-@post_views.route('/comment', methods=['POST'])
+# @post_views.route('/comment', methods=['POST'])
+# @login_required
+# def add_comment():
+#     # 获取表单中提交的数据
+#     body = request.form.get('body')  # 评论内容
+#     user_id = request.form.get('user_id')  # 评论者的用户id
+#     post_id = request.form.get('post_id')  # 评论的帖子id
+#     parent_id = None  # 评论的父评论id
+#
+#     post = Post.query.get_or_404(post_id)
+#     form = CommentForm()
+#     comment_form = CommentForm()
+#
+#     comment = Comment(body=body, user_id=user_id, post_id=post_id, parent_id=parent_id)
+#
+#     # 将Comment对象添加到数据库会话中，并提交到数据库
+#     db.session.add(comment)
+#     db.session.commit()
+#
+#     # 重定向到帖子详情页面，显示最新的评论列表
+#     # return redirect(url_for('post_views.show_post', post_id=post_id))
+#     reversed_comments = reversed([comment for comment in post.comments if comment.parent_id is None])
+#     return render_template('comments_partial.html',
+#                            post=post, user=current_user,
+#                            form=form, comment_form=comment_form,
+#                            reversed_comments=reversed_comments)
+
+
+@post_views.route('/submit_comment', methods=['POST'])
 @login_required
-def add_comment():
-    # 获取表单中提交的数据
-    body = request.form.get('body')  # 评论内容
-    user_id = request.form.get('user_id')  # 评论者的用户id
-    post_id = request.form.get('post_id')  # 评论的帖子id
-    parent_id = request.form.get('parent_id')  # 评论的父评论id
+def submit_comment():
+    if request.method == 'POST':
+        comment_body = request.form['comment_body']
+        post_id = request.form['post_id']
+        parent_comment_id = request.form['parent_comment_id']
 
-    # 创建一个Comment对象，并赋值相应的属性
-    comment = Comment(body=body, user_id=user_id, post_id=post_id, parent_id=parent_id)
+        if parent_comment_id is '0':
+            parent_comment_id = None
 
-    # 将Comment对象添加到数据库会话中，并提交到数据库
-    db.session.add(comment)
-    db.session.commit()
+        post = Post.query.get_or_404(post_id)
+        form = CommentForm()
+        comment_form = CommentForm()
 
-    # 重定向到帖子详情页面，显示最新的评论列表
-    return redirect(url_for('post_views.show_post', post_id=post_id))
+        new_comment = Comment(body=comment_body, user_id=current_user.id, post_id=post_id, parent_id=parent_comment_id)
+        db.session.add(new_comment)
+        db.session.commit()
+
+        reversed_comments = reversed([comment for comment in post.comments if comment.parent_id is None])
+        return render_template('comments_partial.html',
+                               post=post, user=current_user,
+                               form=form, comment_form=comment_form,
+                               reversed_comments=reversed_comments)

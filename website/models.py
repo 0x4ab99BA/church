@@ -3,7 +3,7 @@ from flask_login import UserMixin
 from sqlalchemy.sql import func
 from datetime import datetime
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, TextAreaField, FileField
+from wtforms import StringField, SubmitField, TextAreaField, FileField, HiddenField
 from wtforms.validators import DataRequired, Optional
 from flask_wtf.file import FileField, FileAllowed
 from flask_ckeditor import CKEditorField
@@ -93,6 +93,11 @@ class Comment(db.Model):
     post = db.relationship('Post', backref='comments')  # 与Post模型建立关系，方便查询评论所属的帖子信息
     parent = db.relationship('Comment', remote_side=[id], backref='children')
 
+
+class CommentForm(FlaskForm):
+    comment_body = TextAreaField('Comment', validators=[DataRequired()])
+    parent_id = HiddenField('Parent ID')
+    submit = SubmitField('Submit Comment')
 
 
 class Like(db.Model):

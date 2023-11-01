@@ -1,0 +1,35 @@
+{% for comment in reversed_comments %}
+    <div class="container comment-container">
+        <div class="comment" data-comment-id="{{ comment.id }}">
+            <p> <strong>{{ comment.user.first_name }} </strong> commented at {{ comment.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}:</p>
+            <p>{{ comment.body }}</p>
+            <button class="reply-button">Reply ></button>
+        <br>
+        <br>
+            <div class="reply-form" style="display: none;">
+                <form method="post" action="/submit_comment">
+                    <div class="form-group" style="margin-left: 20px;">
+                        {{ form.comment_body(class="form-control") }}
+                        <button type="button" class="btn btn-primary submit-button">Reply</button> <!-- Change type to "button" -->
+                    </div>
+                    <input type="hidden" name="post_id" value="{{ post.id }}">
+                    <input type="hidden" name="parent_comment_id" value="{{ comment.id }}">
+
+                </form>
+            </div>
+            {% if comment.children %}
+                {% for child_comment in comment.children %}
+                        <div class="comment-container-inner" style="margin-left: 20px;">
+                            <div class="comment" data-comment-id="{{ child_comment.id }}">
+                                <p> <strong> {{ child_comment.user.first_name }} </strong> commented at {{ child_comment.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}:</p>
+                                <p>{{ child_comment.body }}</p>
+                            </div>
+                        </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+{% endfor %}
+
+
+
