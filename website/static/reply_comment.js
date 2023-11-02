@@ -32,6 +32,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 commentContainer.innerHTML = html;
             })
             .catch(error => console.error('Error:', error));
+
+            if (event.target.classList.contains('fas') && event.target.closest('.delete-button')) {
+    }
         }
     });
 });

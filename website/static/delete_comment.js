@@ -1,7 +1,7 @@
 
 $(document).ready(function() {
     // 监听所有的删除按钮
-    $('.delete-button').on('click', function() {
+    $(document).on('click', '.delete-button', function() {
         // 获取评论的ID
         const commentId = $(this).closest('.comment').data('comment-id');
 
@@ -28,3 +28,6 @@ $(document).ready(function() {
         });
     });
 });
+
+
+

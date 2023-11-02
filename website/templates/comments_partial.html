@@ -1,11 +1,7 @@
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.1/css/all.css">
-
 
 {% for comment in reversed_comments %}
     <div class="container comment-container">
         <div class="comment" data-comment-id="{{ comment.id }}">
-{#            <p> <strong>{{ comment.user.first_name }} </strong> commented at {{ comment.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}:</p>#}
             <div class="comment-title-delete" style="display: flex; align-items: center; justify-content: space-between;">
                 <p> <strong>{{ comment.user.first_name }} </strong> commented at {{ comment.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}:</p>
                 <button class="delete-button"><i class="fas fa-minus-circle" style="color: #494040;"></i></button>
@@ -41,6 +37,9 @@
         </div>
     </div>
 {% endfor %}
+
+
+
 
 
 
