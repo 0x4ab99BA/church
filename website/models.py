@@ -56,6 +56,8 @@ class Post(db.Model):
     group = db.relationship('Group', back_populates='posts')
     likes = db.relationship('Like', backref='post', lazy='dynamic')
 
+    # comments = db.relationship('Comment', backref='post', lazy='dynamic')
+
     def like_count(self):
         return self.likes.count()
 

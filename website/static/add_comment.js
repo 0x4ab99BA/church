@@ -2,8 +2,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const submitButton = document.querySelector('.submit-button');
     const commentInput = document.querySelector('.form-control');
 
-    console.log('commentInput', commentInput)
-
     submitButton.addEventListener('click', function() {
         let commentContent = document.querySelector('.form-control').value;
         const postIdInput = document.querySelector('input[name="post_id"]');

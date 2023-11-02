@@ -1,5 +1,5 @@
 function deleteGroupAndPosts(groupId) {
-    if (confirm("Confirm to delete this group and all the posts belong to it?")) {
+    if (confirm("Confirm to delete this group?")) {
           fetch("/delete_group", {
             method: "POST",
             body: JSON.stringify({ groupId: groupId }),

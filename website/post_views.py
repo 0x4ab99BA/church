@@ -24,6 +24,13 @@ def delete_post_and_files(post_to_delete):
             except Exception as e:
                 pass
             db.session.delete(file)
+
+        for like in post_to_delete.likes:
+            db.session.delete(like)
+
+        for comment in post_to_delete.comments:
+            db.session.delete(comment)
+
         db.session.delete(post_to_delete)
         db.session.commit()
     except Exception as e:
@@ -43,8 +50,8 @@ def uploaded_files(filename):
 def upload():
     f = request.files.get('upload')
     extension = f.filename.split('.')[-1].lower()
-    if extension not in ['pdf']:
-        return upload_fail(message='PDF only!')
+    if extension not in ['pdf', 'pptx', 'ppt']:
+        return upload_fail(message='PDF and PPT only!')
     pic_filename = secure_filename(f.filename)
     pic_name = str(uuid.uuid1()) + '_' + pic_filename
     f.save(os.path.join(os.path.join(basedir, 'uploads'), pic_name))
@@ -85,7 +92,7 @@ def delete_post():
         else:
             flash("Cannot delete other's post.", category='error')
 
-    return jsonify({'success': True})
+    return jsonify({'status': 'success'})
 
 
 @post_views.route('/group/<int:group_id>/edit_post/<int:post_id>', methods=['GET', 'POST'])
@@ -207,34 +214,6 @@ def like_post():
         return jsonify({'status': 'success', 'updatedLikeCount': likes})
 
 
-# @post_views.route('/comment', methods=['POST'])
-# @login_required
-# def add_comment():
-#     # 获取表单中提交的数据
-#     body = request.form.get('body')  # 评论内容
-#     user_id = request.form.get('user_id')  # 评论者的用户id
-#     post_id = request.form.get('post_id')  # 评论的帖子id
-#     parent_id = None  # 评论的父评论id
-#
-#     post = Post.query.get_or_404(post_id)
-#     form = CommentForm()
-#     comment_form = CommentForm()
-#
-#     comment = Comment(body=body, user_id=user_id, post_id=post_id, parent_id=parent_id)
-#
-#     # 将Comment对象添加到数据库会话中，并提交到数据库
-#     db.session.add(comment)
-#     db.session.commit()
-#
-#     # 重定向到帖子详情页面，显示最新的评论列表
-#     # return redirect(url_for('post_views.show_post', post_id=post_id))
-#     reversed_comments = reversed([comment for comment in post.comments if comment.parent_id is None])
-#     return render_template('comments_partial.html',
-#                            post=post, user=current_user,
-#                            form=form, comment_form=comment_form,
-#                            reversed_comments=reversed_comments)
-
-
 @post_views.route('/submit_comment', methods=['POST'])
 @login_required
 def submit_comment():
@@ -243,7 +222,7 @@ def submit_comment():
         post_id = request.form['post_id']
         parent_comment_id = request.form['parent_comment_id']
 
-        if parent_comment_id is '0':
+        if parent_comment_id == '0':
             parent_comment_id = None
 
         post = Post.query.get_or_404(post_id)
@@ -259,3 +238,20 @@ def submit_comment():
                                post=post, user=current_user,
                                form=form, comment_form=comment_form,
                                reversed_comments=reversed_comments)
+
+
+@post_views.route('/delete_comment/<int:comment_id>', methods=['POST'])
+@login_required  # 确保只有登录用户可以删除评论
+def delete_comment(comment_id):
+    comment = Comment.query.get_or_404(comment_id)
+
+    # 确保当前用户是评论的作者或有其他权限
+    if current_user.id != comment.user_id and not current_user.admin:
+        flash("cannot delete other's comment", category='error')
+
+    # 删除评论及其子评论
+    Comment.query.filter_by(parent_id=comment_id).delete()
+    db.session.delete(comment)
+    db.session.commit()
+    return jsonify(success=True)
+

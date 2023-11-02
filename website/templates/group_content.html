@@ -78,9 +78,12 @@
                         <span id="like-count-{{ post.id }}">{{ post.like_count() }}</span>
                     </div>
                     <div class="icon-container">
-                        <button type="button" class="btn btn-footer">
-                            <i class="far fa-comment"></i>
-                        </button> Comment
+                        <a href="{{ url_for('post_views.show_post', group_id=group.id, post_id=post.id) }}#comments-section">
+                            <button type="button" class="btn btn-footer">
+                                <i class="far fa-comment"></i>
+                            </button>
+                        </a>
+                        <span>{{ post.comments|length }}</span>
                     </div>
                 </div>
 

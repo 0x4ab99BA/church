@@ -11,23 +11,6 @@ group_views = Blueprint('group_views', __name__)
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 
-def delete_post_and_files(post_to_delete):
-    try:
-        for file in post_to_delete.files:
-            file_path = os.path.join(basedir, 'uploads', file.content)
-            try:
-                if os.path.isfile(file_path):
-                    os.remove(file_path)
-            except Exception as e:
-                pass
-            db.session.delete(file)
-        db.session.delete(post_to_delete)
-        db.session.commit()
-    except Exception as e:
-        db.session.rollback()
-        raise Exception("Error occurred while deleting post")
-
-
 @group_views.route('/groups', methods=['GET', 'POST'])
 @login_required
 def groups():
@@ -99,7 +82,7 @@ def edit_group(group_id):
     return render_template("create_group.html", form=form, user=current_user)
 
 
-@group_views.route('/delete_group/', methods=['POST'])
+@group_views.route('/delete_group', methods=['POST'])
 @login_required
 def delete_group():
     group = json.loads(request.data)
@@ -111,12 +94,13 @@ def delete_group():
             try:
                 # 获取属于该组的所有帖子
                 posts_to_delete = Post.query.filter_by(group_id=group_id).all()
-                for post in posts_to_delete:
-                    delete_post_and_files(post)
 
-                db.session.delete(group_to_delete)
-                db.session.commit()
-                flash("Group and associated posts deleted successfully.", category='success')
+                if posts_to_delete:
+                    flash("cannot delete a group that contains posts..", category='error')
+                else:
+                    db.session.delete(group_to_delete)
+                    db.session.commit()
+                    flash("Group deleted successfully.", category='success')
             except Exception as e:
                 db.session.rollback()
                 flash("Error occurred while deleting group and associated posts.", category='error')
@@ -125,7 +109,7 @@ def delete_group():
     else:
         flash("Group not found.", category='error')
 
-    return redirect(url_for('group_views.groups'))
+    return jsonify('success')
 
 
 @group_views.route('/subscribe/<int:group_id>', methods=['POST'])

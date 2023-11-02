@@ -1,5 +1,6 @@
 {% extends "base.html" %} {% block title %}Home{% endblock %}
 
+
 {% block content %}
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
@@ -75,18 +76,20 @@
             margin-left: 20px; /* 调整按钮与输入框之间的间距 */
         }
 
-
-
-
+        .delete-button{
+            border: none;
+            background-color: #ffffff;
+            {#color: #333;#}
+        }
     </style>
+
 
     <script src="{{ url_for('static', filename='deletePostAndFiles.js') }}"></script>
     <script src="{{ url_for('static', filename='view_more.js') }}"></script>
     <script src="{{ url_for('static', filename='likePost.js') }}"></script>
     <script src="{{ url_for('static', filename='reply_comment.js') }}"></script>
     <script src="{{ url_for('static', filename='add_comment.js') }}"></script>
-
-
+    <script src="{{ url_for('static', filename='delete_comment.js') }}"></script>
 
 
     <div class="container">
@@ -119,7 +122,8 @@
                 <div class="icon-container">
                     <button type="button" class="btn btn-footer">
                         <i class="far fa-comment"></i>
-                    </button> Comment
+                    </button>
+                    <span>{{ post.comments|length }}</span>
                 </div>
             </div>
         </div>
@@ -140,11 +144,14 @@
             </div>
         </div>
 
-        <div class="outer-container">
+        <div class="outer-container", id="comments-section">
             {% for comment in reversed_comments %}
                 <div class="container comment-container">
                     <div class="comment" data-comment-id="{{ comment.id }}">
-                        <p> <strong>{{ comment.user.first_name }} </strong> commented at {{ comment.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}:</p>
+                        <div class="comment-title-delete" style="display: flex; align-items: center; justify-content: space-between;">
+                            <p> <strong>{{ comment.user.first_name }} </strong> commented at {{ comment.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}:</p>
+                            <button class="delete-button"><i class="fas fa-minus-circle" style="color: #494040;"></i></button>
+                        </div>
                         <p>{{ comment.body }}</p>
                         <button class="reply-button">Reply ></button>
                     <br>
@@ -164,7 +171,10 @@
                             {% for child_comment in comment.children %}
                                     <div class="comment-container-inner" style="margin-left: 20px;">
                                         <div class="comment" data-comment-id="{{ child_comment.id }}">
-                                            <p> <strong> {{ child_comment.user.first_name }} </strong> commented at {{ child_comment.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}:</p>
+                                            <div class="comment-title-delete" style="display: flex; align-items: center; justify-content: space-between;">
+                                                <p> <strong> {{ child_comment.user.first_name }} </strong> commented at {{ child_comment.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}:</p>
+                                                <button class="delete-button"><i class="fas fa-minus-circle" style="color: #494040;"></i></button>
+                                            </div>
                                             <p>{{ child_comment.body }}</p>
                                         </div>
                                     </div>
