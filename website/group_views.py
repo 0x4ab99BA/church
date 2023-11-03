@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 
 from . import db
 from .models import Group, GroupForm, PostForm, Post, File
+from .forms import SubscriptionForm
 import os
 
 group_views = Blueprint('group_views', __name__)
@@ -17,8 +18,9 @@ def groups():
     page = request.args.get('page', 1, type=int)
     per_page = 6  # Number of items per page
 
+    form = SubscriptionForm()
     groups = Group.query.paginate(page=page, per_page=per_page)
-    return render_template("groups.html", user=current_user, groups=groups)
+    return render_template("groups.html", user=current_user, groups=groups, form=form)
 
 
 @group_views.route('/create_group', methods=['GET', 'POST'])
@@ -115,20 +117,25 @@ def delete_group():
 @group_views.route('/subscribe/<int:group_id>', methods=['POST'])
 @login_required
 def subscribe(group_id):
-    group = Group.query.get(group_id)
-    user = current_user
-    user.subscriptions.append(group)
-    db.session.commit()
+    form = SubscriptionForm()
+
+    if form.validate_on_submit():
+        group = Group.query.get(group_id)
+        user = current_user
+        user.subscriptions.append(group)
+        db.session.commit()
     return redirect(url_for('group_views.groups'))
 
 
 @group_views.route('/unsubscribe/<int:group_id>', methods=['POST'])
 @login_required
 def unsubscribe(group_id):
-    group = Group.query.get(group_id)
-    user = current_user
-    user.subscriptions.remove(group)
-    db.session.commit()
+    form = SubscriptionForm()
+    if form.validate_on_submit():
+        group = Group.query.get(group_id)
+        user = current_user
+        user.subscriptions.remove(group)
+        db.session.commit()
     return redirect(url_for('group_views.groups'))
 
 

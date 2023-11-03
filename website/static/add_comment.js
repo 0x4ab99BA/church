@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(html => {
             const commentContainer = document.querySelector('.outer-container');
             commentContainer.innerHTML = html;
+            commentInput.value = '';
         })
         .catch(error => console.error('Error:', error));
     });
