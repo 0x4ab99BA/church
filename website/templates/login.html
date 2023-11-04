@@ -1,25 +1,22 @@
-{% extends "base.html" %} {% block title %}Login{% endblock %} {% block content
-%}
+{% extends "base.html" %} {% block title %}Login{% endblock %}
+{% block content %}
     <form method="POST">
-    <h3 align="center">Login</h3>
-    {{ form.hidden_tag() }}
-    <div class="form-group">
-        <label for="email">Email Address</label>
-        {{ form.email(class="form-control") }}
-    </div>
-    <div class="form-group">
-        <label for="password">Password</label>
-        {{ form.password(class="form-control") }}
-    </div>
-    <div class="form-group">
-        <label for="recaptcha">{{ form.recaptcha.label }}</label>
-        {{ form.recaptcha }}
-    </div>
-    <div class="form-group">
-        <button type="submit" class="btn btn-primary">Login</button>
-    </div>
-</form>
+        <h3 align="center">Login</h3>
+        {{ form.hidden_tag() }}
 
-
-
+        <div class="form-group">
+            {{ form.email.label(class="form-label") }}
+            {{ form.email(class="form-control") }}
+        </div>
+        <div class="form-group">
+            {{ form.password.label(class="form-label") }}
+            {{ form.password(class="form-control") }}
+        </div>
+        <div class="form-group">
+            {{ form.recaptcha }}
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary">Login</button>
+        </div>
+    </form>
 {% endblock %}

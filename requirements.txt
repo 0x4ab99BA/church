@@ -6,3 +6,6 @@ SQLAlchemy~=2.0.20
 WTForms~=3.0.1
 python-dotenv~=1.0.0
 beautifulsoup4~=4.12.2
+flask_talisman
+flask_wtf
+email_validator
