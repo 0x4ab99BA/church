@@ -106,6 +106,10 @@
                 </div>
             </div>
             <div class="card-body">
+                <div class="user-info">
+                        <span class="username"> <strong>{{ post.user.first_name }} </strong> posted on </span>
+                        <span class="publish-time">{{ post.created_at.strftime('%Y-%m-%d')}}</span>
+                </div>
                 <div class="post-content" style="max-height: 745px; overflow: hidden;">
                     <p class="card-text">{{ post.content|safe }}</p>
                 </div>

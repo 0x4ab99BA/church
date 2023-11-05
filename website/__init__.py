@@ -59,6 +59,7 @@ def create_app():
         'style-src': [
             '\'self\'',
             '\'unsafe-inline\'',
+            '\'unsafe-eval\'',
             'maxcdn.bootstrapcdn.com',
             'stackpath.bootstrapcdn.com',
             'https://use.fontawesome.com/releases/v5.15.1/css/all.css',

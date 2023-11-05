@@ -26,12 +26,7 @@ def login():
     if form.validate_on_submit():
         email = form.email.data
         password = form.password.data
-
-        print(f'email: {email}')
-
         user = User.query.filter_by(email=email).first()
-
-        print(f'user: {user}')
         if user:
             if check_password_hash(user.password, password):
                 flash('Logged in successfully!', category='success')
