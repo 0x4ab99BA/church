@@ -109,7 +109,8 @@ def edit_post(group_id, post_id):
         flash('Post not found or does not belong to this group', 'error')
         return redirect(url_for('group_views.group_content', group_id=group_id))
 
-    if post.user_id != current_user.id or current_user.admin is False:
+    if post.user_id != current_user.id and current_user.admin is False:
+
         flash('You do not have permission to edit this post', 'error')
         return redirect(url_for('group_views.group_content', group_id=group_id))
 
@@ -248,10 +249,10 @@ def delete_comment(comment_id):
     # 确保当前用户是评论的作者或有其他权限
     if current_user.id != comment.user_id and not current_user.admin:
         flash("cannot delete other's comment", category='error')
-
-    # 删除评论及其子评论
-    Comment.query.filter_by(parent_id=comment_id).delete()
-    db.session.delete(comment)
-    db.session.commit()
+    else:
+        # 删除评论及其子评论
+        Comment.query.filter_by(parent_id=comment_id).delete()
+        db.session.delete(comment)
+        db.session.commit()
     return jsonify(success=True)
 

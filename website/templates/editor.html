@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CKEditor Example</title>
+    {{ ckeditor.load() }}
+</head>
+<body>
+    <h1>CKEditor Example</h1>
+    <form method="post">
+        {{ ckeditor.create() }}
+        <input type="submit" value="Submit">
+    </form>
+</body>
+</html>

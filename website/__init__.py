@@ -21,11 +21,13 @@ def create_app():
     app = Flask(__name__)
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
-    app.config['RECAPTCHA_USE_SSL'] = False
-    app.config['RECAPTCHA_PUBLIC_KEY'] = '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'
-    app.config['RECAPTCHA_PRIVATE_KEY'] = '6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe'
+    app.config['RECAPTCHA_USE_SSL'] = True
+    # app.config['RECAPTCHA_PUBLIC_KEY'] = '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'
+    # app.config['RECAPTCHA_PRIVATE_KEY'] = '6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe'
+    app.config['RECAPTCHA_PUBLIC_KEY'] = '6LdOICIqAAAAAFbWW0XlF9betjpTaCLqUKubnV5U'
+    app.config['RECAPTCHA_PRIVATE_KEY'] = '6LdOICIqAAAAAIs271bS2urpvsfVcF8XRnzQ15Ja'
     app.config['RECAPTCHA_OPTIONS'] = {'theme': 'white'}
-    app.config['CKEDITOR_PKG_TYPE'] = 'full'
+    app.config['CKEDITOR_PKG_TYPE'] = 'standard'
     app.config['CKEDITOR_SERVE_LOCAL'] = True
     app.config['CKEDITOR_HEIGHT'] = 400
     app.config['CKEDITOR_FILE_UPLOADER'] = 'post_views.upload'
@@ -116,3 +118,6 @@ def create_database(app):
     if not path.exists('website/' + DB_NAME):
         db.create_all(app=app)
         print('Created Database!')
+
+
+

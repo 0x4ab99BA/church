@@ -138,17 +138,13 @@
         </form>
     </div>
 
-
-    <script src="/static/ckeditor/ckeditor.js"></script>
     <script>
         CKEDITOR.replace( '{{ form.body.id }}', {
             extraPlugins: 'filebrowser',
             filebrowserImageUploadUrl: '/upload_image',
-            filebrowserUploadUrl: '/upload'
+            filebrowserUploadUrl: '/upload',
         });
     </script>
-
-    {{ ckeditor.load() }}
 
 
 {% endblock %}

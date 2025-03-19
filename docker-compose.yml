@@ -1,0 +1,15 @@
+# version: '3'
+services:
+  flask_app:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=production
+    volumes:
+      - my_nginx_project_flask_data:/app/instance  # 保持原有的数据库持久化
+      - ./uploads:/app/website/uploads
+
+volumes:
+  my_nginx_project_flask_data:
+    external: true
