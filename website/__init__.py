@@ -24,8 +24,6 @@ def create_app():
     app.config['RECAPTCHA_USE_SSL'] = True
     # app.config['RECAPTCHA_PUBLIC_KEY'] = '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'
     # app.config['RECAPTCHA_PRIVATE_KEY'] = '6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe'
-    app.config['RECAPTCHA_PUBLIC_KEY'] = '6LdOICIqAAAAAFbWW0XlF9betjpTaCLqUKubnV5U'
-    app.config['RECAPTCHA_PRIVATE_KEY'] = '6LdOICIqAAAAAIs271bS2urpvsfVcF8XRnzQ15Ja'
     app.config['RECAPTCHA_OPTIONS'] = {'theme': 'white'}
     app.config['CKEDITOR_PKG_TYPE'] = 'standard'
     app.config['CKEDITOR_SERVE_LOCAL'] = True
